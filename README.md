@@ -1,12 +1,13 @@
 # Hotel Dusk: Room 215 (USA) - Decompilation & 1:1 Matching Rebuild
 
-Matching decompilation and asset extraction toolchain for **Hotel Dusk: Room 215** (Nintendo DS, USA release `AWIE`).
+Matching decompilation, asset extraction toolchain, and native PC port for **Hotel Dusk: Room 215** (Nintendo DS, USA release `AWIE`).
 
 ## Overview
 
 - **Matching Parity**: 100% bit-for-bit byte match against retail No-Intro / Redump ROM.
 - **Decompiled C Code**: 3,800 functions extracted from ARM9 (`0x02004000`) using Ghidra.
 - **Engine Algorithms**: Native C implementation of Cing's 64KB sliding-window LZSS and NitroSDK BLZ backwards LZ77.
+- **Native PC Port**: Standalone C/SDL2 PC runtime featuring Book Mode dual-screen layout and mouse stylus emulation.
 - **Asset Pipeline**: Automatic NitroFS and Cing `.tbl`/`.wpf` unpacker/repacker.
 
 ## Verification
@@ -42,14 +43,33 @@ hotel-dusk-decomp/
 │       ├── hotel_dusk_arm9.c   # Decompiled ARM9 C code (3,800 functions, 4.5 MB)
 │       ├── hotel_dusk_engine.c # Cing LZSS ring buffer, Nitro BLZ, and script VM
 │       └── hotel_dusk_main.c   # Standalone PC entry point
+├── pc/
+│   ├── include/                # PC port display and font definitions
+│   ├── src/                    # SDL2 dual-screen renderer, asset loader, main loop
+│   └── build_pc.bat            # MSVC x64 build script for HotelDusk_PC.exe
 ├── tools/
 │   ├── build.py                # Main build orchestrator (pret / n64decomp style)
 │   ├── build_rom.py            # Bit-perfect ROM reconstructor
 │   ├── extract_assets.py       # NitroFS and Cing .tbl/.wpf package extractor
 │   └── verify.py               # SHA-256 and MD5 integrity auditor
-├── build.bat                   # 1-click Windows build script
-└── verify.bat                  # 1-click Windows audit script
+├── build.bat                   # 1-click ROM rebuild script
+├── verify.bat                  # 1-click integrity audit script
+└── play_hotel_dusk_pc.bat      # 1-click native PC port launcher
 ```
+
+## Native PC Port (Phase 1)
+
+This repository includes a standalone **Native PC Port** built in C with SDL2:
+- **Dual-Screen Book Mode**: Side-by-side portrait screens (1184x768 at 3x scale) with authentic hinge spine.
+- **Stylus Input**: Mouse cursor maps 1:1 to NDS touchscreen coordinates (0..191, 0..255).
+- **Hardware Simulation**: Keyboard triggers for NDS mic blow (`M`), clamshell lid sensor (`L`), and fullscreen (`F11`).
+- **Direct Asset Streaming**: Native C loader for Cing 192x256 `.bin` backgrounds and narrative script books.
+
+### Build & Run PC Port
+```cmd
+play_hotel_dusk_pc.bat
+```
+*(Automatically builds `build/HotelDusk_PC.exe` via MSVC 2022 and runs immediately).*
 
 ## Technical Notes
 
@@ -71,7 +91,7 @@ All 45 overlays and the tail of `arm9.bin` are compressed using NitroSDK backwar
 - Trailer layout (last 8-12 bytes): `enc_len` (3 bytes) + `hdr_len` (1 byte) + `diff` (4 bytes).
 - Uncompressed ARM9 executable size: 1,031,352 bytes (expanded from 603,240 bytes).
 
-## Building & Verification
+## Building & Verification (ROM)
 
 ### Prerequisites
 - Python 3.8+

@@ -7,6 +7,9 @@ build/
 *.pdb
 *.ilk
 
+# External dependencies (Auto-fetched by build scripts)
+pc/lib/
+
 # ROM dumps (Do not commit copyrighted Nintendo game dumps)
 baserom.nds
 *.sav
