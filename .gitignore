@@ -1,0 +1,22 @@
+# Build artifacts
+build/
+*.bin
+*.nds
+*.obj
+*.exe
+*.pdb
+*.ilk
+
+# ROM dumps (Do not commit copyrighted Nintendo game dumps)
+baserom.nds
+*.sav
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE & OS files
+.vscode/
+.vs/
+Thumbs.db
+.DS_Store
