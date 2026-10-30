@@ -5,9 +5,9 @@ Matching decompilation and asset extraction toolchain for **Hotel Dusk: Room 215
 ## Overview
 
 - **Matching Parity**: 100% bit-for-bit byte match against retail No-Intro / Redump ROM.
-- **Decompiled C Code**: 3,800 functions extracted from ARM9 (`0x02004000`) using Ghidra 12.1.4 Public.
+- **Decompiled C Code**: 3,800 functions extracted from ARM9 (`0x02004000`) using Ghidra.
 - **Engine Algorithms**: Native C implementation of Cing's 64KB sliding-window LZSS and NitroSDK BLZ backwards LZ77.
-- **Assets**: 7,462 extracted files (765 NitroFS files + 6,605 unpacked files from 275 `.tbl`/`.wpf` archives).
+- **Asset Pipeline**: Automatic NitroFS and Cing `.tbl`/`.wpf` unpacker/repacker.
 
 ## Verification
 
@@ -23,7 +23,32 @@ Parity:             100.00% exact match (0 byte delta)
 
 Run verification on Windows:
 ```cmd
-recompiled_1to1\verify_checksums.bat
+verify.bat
+```
+or via Python:
+```bash
+python tools/verify.py
+```
+
+## Repository Structure
+
+```text
+hotel-dusk-decomp/
+├── arm9/
+│   ├── include/
+│   │   ├── hotel_dusk_arm9.h   # Function prototypes (3,800 functions)
+│   │   └── hotel_dusk_types.h  # Hardware registers, memory maps, structs
+│   └── src/
+│       ├── hotel_dusk_arm9.c   # Decompiled ARM9 C code (3,800 functions, 4.5 MB)
+│       ├── hotel_dusk_engine.c # Cing LZSS ring buffer, Nitro BLZ, and script VM
+│       └── hotel_dusk_main.c   # Standalone PC entry point
+├── tools/
+│   ├── build.py                # Main build orchestrator (pret / n64decomp style)
+│   ├── build_rom.py            # Bit-perfect ROM reconstructor
+│   ├── extract_assets.py       # NitroFS and Cing .tbl/.wpf package extractor
+│   └── verify.py               # SHA-256 and MD5 integrity auditor
+├── build.bat                   # 1-click Windows build script
+└── verify.bat                  # 1-click Windows audit script
 ```
 
 ## Technical Notes
@@ -46,41 +71,18 @@ All 45 overlays and the tail of `arm9.bin` are compressed using NitroSDK backwar
 - Trailer layout (last 8-12 bytes): `enc_len` (3 bytes) + `hdr_len` (1 byte) + `diff` (4 bytes).
 - Uncompressed ARM9 executable size: 1,031,352 bytes (expanded from 603,240 bytes).
 
-## Directory Layout
+## Building & Verification
 
-```text
-hotel_dusk_decompiled_c/
-  hotel_dusk_arm9.c       Decompiled ARM9 functions (3,800 functions, 4.5 MB)
-  hotel_dusk_arm9.h       Header prototypes (194 KB)
-  hotel_dusk_engine.c     Cing LZSS, BLZ, and script VM implementations
-  hotel_dusk_types.h      Hardware registers, memory map, structs
-  hotel_dusk_main.c       PC entry point and initialization
-  build.bat               MSVC x64 build script
+### Prerequisites
+- Python 3.8+
+- An authentic dump of `0823 - Hotel Dusk - Room 215 (USA).nds`
 
-hotel_dusk_extracted/
-  nitrofs/                765 NitroFS files across 65 directories
-  unpacked/               6,605 unpacked Cing container subfiles (scripts, anims)
-  overlays/               45 decompressed overlays (overlay_0000..0044.bin)
-  binaries/               arm9_decompressed.bin (1MB), arm9_raw.bin, arm7.bin
-
-recompiled_1to1/
-  build_1to1_recompile.py Rebuild script from extracted components
-  verify_checksums.bat    Hash audit script
-  play_hotel_dusk_1to1.bat 1-click launcher for recompiled build
-```
-
-## Building
-
-### Rebuild 1:1 ROM
-Requires Python 3.8+:
+### Quick Start
+1. Place your clean ROM dump in the root directory and rename it to `baserom.nds`.
+2. Run the build pipeline:
 ```cmd
-python recompiled_1to1\build_1to1_recompile.py
-```
-
-### Compile Native C Code
-Requires MSVC 2022 (Community / Build Tools):
-```cmd
-cd hotel_dusk_decompiled_c
 build.bat
 ```
-Produces `hotel_dusk_core.exe`.
+*(On Linux/macOS: `python tools/build.py`)*
+
+3. The recompiled bit-perfect ROM will be written to `build/hotel_dusk_recompiled.nds` and audited against official No-Intro checksums.
