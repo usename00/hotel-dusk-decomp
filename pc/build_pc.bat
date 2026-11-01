@@ -5,6 +5,7 @@ cd /d "%~dp0"
 
 echo ======================================================================
 echo  Hotel Dusk: Room 215 (USA) - Native PC Port Builder (MSVC x64)
+echo  Phase 2: Rotoscope Animation, Interactive Dialogue, Native Audio
 echo ======================================================================
 echo.
 
@@ -22,7 +23,7 @@ if not exist "%~dp0lib\SDL2-2.30.8\include\SDL.h" (
     echo [INFO] SDL2 package ready.
 )
 
-echo [1/3] Initializing Visual Studio 2022 x64 Build Environment...
+echo [1/4] Initializing Visual Studio 2022 x64 Build Environment...
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" >nul
 if errorlevel 1 (
     echo [ERROR] Could not initialize MSVC 2022!
@@ -30,7 +31,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [2/3] Compiling Native C Source Files...
+echo [2/4] Compiling Native C Source Files...
 cl.exe /nologo /O2 /W3 /D_CRT_SECURE_NO_WARNINGS ^
     /I "%~dp0include" ^
     /I "%~dp0lib\SDL2-2.30.8\include" ^
@@ -38,6 +39,9 @@ cl.exe /nologo /O2 /W3 /D_CRT_SECURE_NO_WARNINGS ^
     "%~dp0src\main.c" ^
     "%~dp0src\display.c" ^
     "%~dp0src\asset_loader.c" ^
+    "%~dp0src\audio.c" ^
+    "%~dp0src\animation.c" ^
+    "%~dp0src\dialogue.c" ^
     "%~dp0..\arm9\src\hotel_dusk_engine.c" ^
     /Fe:"%~dp0..\build\HotelDusk_PC.exe" ^
     /Fo:"%~dp0..\build\\" ^
@@ -52,8 +56,12 @@ if errorlevel 1 (
 )
 
 echo.
-echo [3/3] Deploying SDL2.dll runtime...
+echo [3/4] Deploying SDL2.dll runtime...
 copy /Y "%~dp0lib\SDL2-2.30.8\lib\x64\SDL2.dll" "%~dp0..\build\SDL2.dll" >nul
+
+echo [4/4] Deploying SFX audio assets...
+if not exist "..\build\assets\sfx" mkdir "..\build\assets\sfx"
+copy /Y "%~dp0assets\sfx\*.wav" "%~dp0..\build\assets\sfx\" >nul
 
 echo ======================================================================
 echo  BUILD SUCCEEDED: HotelDusk_PC.exe is ready!

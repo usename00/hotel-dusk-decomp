@@ -1,13 +1,13 @@
-# Hotel Dusk: Room 215 (USA) - Decompilation & 1:1 Matching Rebuild
+# Hotel Dusk: Room 215 (USA) - Decompilation & Native PC Port
 
-Matching decompilation, asset extraction toolchain, and native PC port for **Hotel Dusk: Room 215** (Nintendo DS, USA release `AWIE`).
+Matching decompilation, asset extraction toolchain, and standalone native PC port for **Hotel Dusk: Room 215** (Nintendo DS, USA release `AWIE`).
 
 ## Overview
 
 - **Matching Parity**: 100% bit-for-bit byte match against retail No-Intro / Redump ROM.
 - **Decompiled C Code**: 3,800 functions extracted from ARM9 (`0x02004000`) using Ghidra.
 - **Engine Algorithms**: Native C implementation of Cing's 64KB sliding-window LZSS and NitroSDK BLZ backwards LZ77.
-- **Native PC Port**: Standalone C/SDL2 PC runtime featuring Book Mode dual-screen layout and mouse stylus emulation.
+- **Native PC Port (Phase 2)**: Standalone 60 FPS C/SDL2 PC runtime featuring rotoscope character animation, interactive dialogue choices, authentic audio mixer, and Book Mode dual-screen layout.
 - **Asset Pipeline**: Automatic NitroFS and Cing `.tbl`/`.wpf` unpacker/repacker.
 
 ## Verification
@@ -31,6 +31,36 @@ or via Python:
 python tools/verify.py
 ```
 
+## Native PC Port (Phase 2 Features)
+
+This repository includes a standalone **Native PC Port** built in pure C with SDL2:
+
+- **Rotoscope Animation Engine**: Real-time rendering of authentic sketch-animated character sprites (Ed, Mila, Kyle, Opening) with vintage pencil-wobble cadence.
+- **Interactive Dialogue & Branching Choices**: Full conversational state machine with speaker badges, word-wrapped typewriter text reveal, and interactive mouse-selectable inquiry options.
+- **Native Audio Subsystem (Stereo 44.1kHz)**: 16-channel low-latency mixer playing official Hotel Dusk sound effects (page turns, typewriter clicks, pen draws, bells, doors) and atmospheric background music.
+- **Dual-Screen Book Mode**: Side-by-side 192x256 displays at crisp 3x pixel scale (1184x768) with hardware clamshell hinge.
+- **Investigation Notebook**: Toggleable memoir journal featuring Kyle Hyde's Chapter 1 case notes.
+
+### Controls & Keybindings
+
+| Key / Action | Function |
+| :--- | :--- |
+| **Mouse Left Click** | Stylus touchscreen touch, advance dialogue, select inquiry choices |
+| **Spacebar** | Advance dialogue / turn notebook page |
+| **Tab** | Toggle between Conversation Mode and Kyle's Memoir Notebook |
+| **1, 2, 3** | Select dialogue inquiries / Switch background scenes |
+| **S** | Toggle audio mute / unmute |
+| **M** | Simulate NDS microphone blow sensor |
+| **L** | Simulate NDS clamshell lid sensor (sleep / wake) |
+| **F11** | Toggle fullscreen mode |
+| **ESC** | Exit game |
+
+### Build & Run PC Port
+```cmd
+play_hotel_dusk_pc.bat
+```
+*(Automatically builds `build/HotelDusk_PC.exe` via MSVC 2022 and runs immediately).*
+
 ## Repository Structure
 
 ```text
@@ -44,8 +74,9 @@ hotel-dusk-decomp/
 │       ├── hotel_dusk_engine.c # Cing LZSS ring buffer, Nitro BLZ, and script VM
 │       └── hotel_dusk_main.c   # Standalone PC entry point
 ├── pc/
-│   ├── include/                # PC port display and font definitions
-│   ├── src/                    # SDL2 dual-screen renderer, asset loader, main loop
+│   ├── assets/sfx/             # 16 extracted official Hotel Dusk PCM WAV sound effects
+│   ├── include/                # PC port display, audio, animation, and dialogue headers
+│   ├── src/                    # SDL2 renderer, rotoscope engine, dialogue VM, audio mixer
 │   └── build_pc.bat            # MSVC x64 build script for HotelDusk_PC.exe
 ├── tools/
 │   ├── build.py                # Main build orchestrator (pret / n64decomp style)
@@ -56,20 +87,6 @@ hotel-dusk-decomp/
 ├── verify.bat                  # 1-click integrity audit script
 └── play_hotel_dusk_pc.bat      # 1-click native PC port launcher
 ```
-
-## Native PC Port (Phase 1)
-
-This repository includes a standalone **Native PC Port** built in C with SDL2:
-- **Dual-Screen Book Mode**: Side-by-side portrait screens (1184x768 at 3x scale) with authentic hinge spine.
-- **Stylus Input**: Mouse cursor maps 1:1 to NDS touchscreen coordinates (0..191, 0..255).
-- **Hardware Simulation**: Keyboard triggers for NDS mic blow (`M`), clamshell lid sensor (`L`), and fullscreen (`F11`).
-- **Direct Asset Streaming**: Native C loader for Cing 192x256 `.bin` backgrounds and narrative script books.
-
-### Build & Run PC Port
-```cmd
-play_hotel_dusk_pc.bat
-```
-*(Automatically builds `build/HotelDusk_PC.exe` via MSVC 2022 and runs immediately).*
 
 ## Technical Notes
 
